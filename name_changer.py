@@ -26,7 +26,7 @@ for file in files:
             title = tree.xpath('//a[@itemprop="url"]/text()')[0]
             circle = tree.xpath('//span[@itemprop="brand" and @class="maker_name"]/*/text()')[0]
             if title and circle:
-                new_name = ' [' + circle + '] ' title
+                new_name = ' [' + circle + '] ' + title
                 try:
                     os.rename(file, os.path.join(file[:rj_idx+1], rj_code + new_name))
                 except:
