@@ -2,7 +2,8 @@
 A tiny script to change folder name by getting info from dlsite server.
 Supports Japan, Taiwan, and English sites.
 ***  
-## folder name requirements  
+### Environment requirements: Python 3.4+, tkinter, lxml, requests
+## Folder name requirements  
 RJ######    
 RT######    
 RE######    
