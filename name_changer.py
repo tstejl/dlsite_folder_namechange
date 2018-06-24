@@ -18,7 +18,6 @@ def match_rj(rj_code):
     if r.status_code != 200:
         print(r.status_code, r.headers['Location'])
         return r.status_code, "", ""
-    print(r.status_code, r.headers['Location'])
     tree = html.fromstring(r.content)
     title = tree.xpath('//a[@itemprop="url"]/text()')[0]
     circle = tree.xpath('//span[@itemprop="brand" and @class="maker_name"]/*/text()')[0]
