@@ -34,11 +34,8 @@ def match_rt(rt_code):
     circle = tree.xpath('//a[@class="summary_author"]/text()')[0]
     return 200, title, circle
 
-fo = open('log.txt', 'a', encoding='utf-8')
-fo.close()
-fo = open('log.txt', 'w', encoding='utf-8')
 path = filedialog.askdirectory()
-
+fo = None
 #ensure path name is exactly RJ###### or RT###### or RE######
 pattern = re.compile("^R[EJT]\d{6}$")
 
@@ -58,11 +55,17 @@ for file in files:
                 try:
                     os.rename(file, os.path.join(file[:r_idx+1], r_code + new_name))
                 except:
-                    print('\t renaming error.')
+                    print('--Renaming error.')
+                    if fo == None:
+                        fo = open(path + '/log.txt', 'a', encoding='utf-8')
+                        print('--A log.txt file has been created under selected directory.')
+                        fo.close()
+                    fo = open(path + '/log.txt', 'w', encoding='utf-8')
                     fo.write(r_code + ' ' + new_name + '\n')
+                    print('--Formatted name has been saved to file.')
                     #log detailed information to file
             else:
-                print('\tAn error occurred.')
+                print('**An error occurred.')
             time.sleep(0.3) #set delay to avoid being blocked from server
 fo.close()
-print("Finished.")
+print("~Finished.")
