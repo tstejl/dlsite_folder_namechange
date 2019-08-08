@@ -1,20 +1,20 @@
-
 import time
 import glob
 import shutil
 import os
 from pathlib import Path
 from tkinter import filedialog
+from lxml import etree
 from lxml import html
 import requests
 import re
 
-RJ_WEBPATH = 'http://www.dlsite.com/maniax/work/=/product_id/'
+RJ_WEBPATH = 'https://www.dlsite.com/maniax/work/=/product_id/'
 RT_WEBPATH = 'https://www.dlsite.com.tw/work/product_id/'
-COOKIE =  {'adultchecked': '1'}
+RJ_COOKIE =  {'adultchecked': '1', 'DL_SITE_DOMAIN': 'maniax'}
 
 def match_rj(rj_code):
-    r = requests.get(RJ_WEBPATH + rj_code, allow_redirects=False)
+    r = requests.get(RJ_WEBPATH + rj_code, allow_redirects=False, cookies=RJ_COOKIE)
     if r.status_code != 200:
         print(r.status_code, r.headers['Location'])
         return r.status_code, "", ""
@@ -25,7 +25,7 @@ def match_rj(rj_code):
 
 def match_rt(rt_code):
     r = requests.get(RT_WEBPATH + rt_code + '.html',
-                    allow_redirects=False, cookies=RT_COOKIE)
+                    allow_redirects=False)
     if r.status_code != 200:
         print("\tStatus code: ", r.status_code, ";\n\tRedirect to:", r.headers['Location'])
         return r.status_code, "", ""
@@ -35,9 +35,12 @@ def match_rt(rt_code):
     return 200, title, circle
 
 path = filedialog.askdirectory()
-fo = None
+
 #ensure path name is exactly RJ###### or RT###### or RE######
 pattern = re.compile("^R[EJT]\d{6}$")
+
+#filter to substitute illegal filenanme characters to ""
+filter = re.compile('[\\\/:"*?<>|]+')
 
 files = glob.glob(path + "\\*")
 for file in files:
@@ -52,20 +55,12 @@ for file in files:
                 r_status, title, circle = match_rt(r_code)
             if r_status == 200 and title and circle:
                 new_name = ' [' + circle + '] ' + title
+                new_name = re.sub(filter, "", new_name)
                 try:
                     os.rename(file, os.path.join(file[:r_idx+1], r_code + new_name))
-                except:
-                    print('--Renaming error.')
-                    if fo == None:
-                        fo = open(path + '/log.txt', 'a', encoding='utf-8')
-                        print('--A log.txt file has been created under selected directory.')
-                        fo.close()
-                    fo = open(path + '/log.txt', 'w', encoding='utf-8')
-                    fo.write(r_code + ' ' + new_name + '\n')
-                    print('--Formatted name has been saved to file.')
-                    #log detailed information to file
+                except os.error as err:
+                    print("Can't format %s", new_name)
             else:
                 print('**An error occurred.')
-            time.sleep(0.3) #set delay to avoid being blocked from server
-fo.close()
+            time.sleep(0.1) #set delay to avoid being blocked from server
 print("~Finished.")
