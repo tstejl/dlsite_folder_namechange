@@ -12,6 +12,7 @@ import re
 RJ_WEBPATH = 'https://www.dlsite.com/maniax/work/=/product_id/'
 RT_WEBPATH = 'https://www.dlsite.com.tw/work/product_id/'
 RJ_COOKIE =  {'adultchecked': '1', 'DL_SITE_DOMAIN': 'maniax'}
+RT_COOKIE = {'adultchecked': '1'}
 
 def match_rj(rj_code):
     r = requests.get(RJ_WEBPATH + rj_code, allow_redirects=False, cookies=RJ_COOKIE)
@@ -25,7 +26,7 @@ def match_rj(rj_code):
 
 def match_rt(rt_code):
     r = requests.get(RT_WEBPATH + rt_code + '.html',
-                    allow_redirects=False)
+                    allow_redirects=False, cookies=RT_COOKIE)
     if r.status_code != 200:
         print("\tStatus code: ", r.status_code, ";\n\tRedirect to:", r.headers['Location'])
         return r.status_code, "", ""
